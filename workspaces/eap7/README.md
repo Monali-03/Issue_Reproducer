@@ -41,9 +41,16 @@ cd workspaces/eap7
 | `--keep-running` | leave the servers up afterwards so you can poke at them |
 | `--clean` | kill anything this workspace left running, then exit |
 
-Nothing else is needed: the reproducer discovers the EAP installation, picks the JDK,
-plans ports, seeds one isolated server tree per node, **builds the test application
-itself**, deploys it, starts the cluster and drives the scenario.
+From there the reproducer discovers the EAP installation, picks the JDK, plans ports, seeds
+one isolated server tree per node, **builds the test application itself**, deploys it,
+starts the cluster and drives the scenario.
+
+It does need an EAP 7.x installation and a matching JDK already on the host — neither is
+shipped here. Unpack the zip under `~/Documents/EAP_lab/`, `/opt/`, or your home directory,
+or point at it with `EAP_HOME=/path/to/jboss-eap-7.4 ./run.sh`; install the JDK with
+`dnf install java-11-openjdk-devel`. The exact search paths and the version-matching rules
+are in the repository README under **Setup**. If either is missing the run ends `BLOCKED`
+with the paths it tried.
 
 ## 3. What comes out
 

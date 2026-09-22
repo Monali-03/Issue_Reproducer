@@ -55,6 +55,13 @@ The run resolves the JDK, compiles the workload **with that JDK**, starts it und
 customer's flags, waits for it to actually be working, samples the live process, and reads
 the verdict off the samples rather than off the log wording.
 
+There is no product to install here — the JDK *is* the subject. But it has to be the major
+version the case names, and this workspace will not substitute another one, so install it
+first: `dnf install java-17-openjdk-devel`, or unpack a tarball JDK into `~/jdks/`.
+`$JAVA_HOME`, `/usr/lib/jvm/*/`, `~/jdks/*/`, `/opt/jdk*/` and `/opt/java/*/` are searched,
+in that order. A missing JDK ends the run `BLOCKED` with every JDK it did find listed;
+`--allow-jdk-substitute` overrides that and heads the deviation list with the substitution.
+
 ## 3. What comes out
 
 `output/<case>-<timestamp>/`, with `output/latest` pointing at the most recent run:

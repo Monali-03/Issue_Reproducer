@@ -17,6 +17,9 @@ workspaces/
 
 ## Use it
 
+First time on a machine, put the product binaries and a JDK where the run can find them —
+see [Setup](#setup-where-to-put-the-binaries-and-the-jdks). Then:
+
 ```bash
 cd workspaces/eap7          # or eap8, datagrid, jvm
 $EDITOR input/case.txt      # the customer's scenario
@@ -147,8 +150,86 @@ a `workspace.env` and a `run.sh`, not editing the drivers.
 ## Requirements
 
 - bash 4.4+, curl, java, maven (for the EAP test applications)
-- the product installation itself: EAP 7.x, EAP 8.x or Data Grid 8.x, found automatically
-  under the globs in `workspace.env`, or pointed at with `EAP_HOME=` / `RHDG_HOME=`
+- **the product binaries.** They are not in this repository and cannot be — EAP and Data
+  Grid are downloaded from the Red Hat Customer Portal under your own subscription. You
+  unpack them yourself; see below.
+
+## Setup: where to put the binaries and the JDKs
+
+Nothing is installed by this repository. Each run looks for a product installation and a
+JDK already on the host, and stops with `BLOCKED` naming what it could not find rather than
+substituting something else.
+
+### The product installation
+
+Download the **zip** distribution from [access.redhat.com/downloads](https://access.redhat.com/downloads)
+and unpack it. Either put it where the workspace already looks, or point at it explicitly —
+the environment variable always wins over the search.
+
+| workspace | download | searched, in order | override |
+|---|---|---|---|
+| `eap7` | Red Hat JBoss EAP 7.x | `~/Documents/EAP_lab/jboss-eap-7*` · `/opt/jboss-eap-7*` · `~/jboss-eap-7*` · `/opt/rh/eap7` | `EAP_HOME=` |
+| `eap8` | Red Hat JBoss EAP 8.x | `~/Documents/EAP_lab/jboss-eap-8*` · `/opt/jboss-eap-8*` · `~/jboss-eap-8*` · `/opt/rh/eap8` | `EAP_HOME=` |
+| `datagrid` | Red Hat Data Grid 8.x **Server** | `~/Documents/Datagrid/redhat-datagrid-*-server` · `~/Documents/EAP_lab/redhat-datagrid-*-server` · `/opt/redhat-datagrid-*-server` · `~/infinispan-server-*` | `RHDG_HOME=` |
+| `jvm` | nothing — the JDK *is* the product | — | — |
+
+```bash
+mkdir -p ~/Documents/EAP_lab && cd ~/Documents/EAP_lab
+unzip ~/Downloads/jboss-eap-7.4.0.zip        # -> jboss-eap-7.4.0/jboss-eap-7.4/
+unzip ~/Downloads/jboss-eap-8.1.0.zip
+
+mkdir -p ~/Documents/Datagrid && cd ~/Documents/Datagrid
+unzip ~/Downloads/redhat-datagrid-8.5.2-server.zip
+```
+
+Or leave the binaries wherever they are:
+
+```bash
+EAP_HOME=/srv/labs/jboss-eap-7.4 ./run.sh
+RHDG_HOME=/srv/labs/redhat-datagrid-8.5.2-server ./run.sh
+```
+
+`EAP_HOME` is the directory holding `bin/standalone.sh`. One level of nesting is searched
+automatically, because the EAP archives unpack as `jboss-eap-7.4.0/jboss-eap-7.4/`.
+`RHDG_HOME` is the directory holding `bin/server.sh`.
+
+The search paths are not hardcoded in the drivers — they are `WS_INSTALL_GLOB` in each
+`workspaces/<product>/workspace.env`. Edit that line if your lab lives somewhere else and
+you would rather not export a variable on every run.
+
+**Keep more than one version unpacked if you support more than one.** Discovery collects
+every candidate and picks the install whose **own version banner** agrees with the case, not
+the first one the glob returns; the newest is only the fallback. This is what lets an 8.2
+case and an 8.1 case run on the same machine and each get the right server. A wrong-major
+install in a workspace is refused outright: an EAP 8 tree under `eap7/` stops the run.
+
+### The JDK
+
+`java` on `PATH` is not enough — the run needs a JDK of the **major version the case names**,
+and for a JVM case it will not substitute another one. Searched, in order:
+
+1. `$JAVA_HOME` — used only if its major matches what the case asks for
+2. `/usr/lib/jvm/*/` — where RHEL and Fedora put `java-17-openjdk` and friends
+3. `~/jdks/*/` — unpack tarball JDKs here
+4. `/opt/jdk*/` and `/opt/java/*/`
+
+```bash
+sudo dnf install java-11-openjdk-devel java-17-openjdk-devel java-21-openjdk-devel
+```
+
+Defaults if the case names no JDK: EAP 7 → 11, EAP 8 → **17** (EAP 8 will not boot on 11 —
+its own modules are compiled to class file 61), Data Grid → 17, JVM → 17. `./run.sh` prints
+every JDK it found when it cannot satisfy the case. `--allow-jdk-substitute` lets a run
+proceed on a different JDK and puts that substitution at the top of the deviation list.
+
+### If it cannot find them
+
+There is no separate discovery check: the run resolves the install and the JDK as its first
+steps and prints both, so a misconfigured host fails in seconds rather than halfway through.
+Missing pieces end the run as `BLOCKED` (exit 4) with the paths it searched and the exact
+variable to set — a blocked run is a broken lab, never a statement about the customer's
+issue. `./run.sh --clean` stops anything a previous run left up and frees the workspace's
+ports; it is cleanup, not a dry run.
 
 ## `.claude/`
 

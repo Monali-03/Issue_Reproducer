@@ -49,8 +49,13 @@ overlays TCPPING discovery, **creates the REST user**, starts the cluster, then 
 bundled cache harness: create the cache, write a known set of entries, read **every one
 back from every node**, kill a node, and read them all again.
 
-`RHDG_HOME=/path/to/redhat-datagrid-8.x-server ./run.sh` if the installation is somewhere
-the search globs do not cover.
+It does need a Data Grid 8.x **server** distribution and a JDK already on the host — neither
+is shipped here. Unpack `redhat-datagrid-8.x-server.zip` under `~/Documents/Datagrid/` or
+`/opt/`, or point at it with `RHDG_HOME=/path/to/redhat-datagrid-8.5.2-server ./run.sh` if
+the installation is somewhere the search globs do not cover. `RHDG_HOME` is the directory
+holding `bin/server.sh`. The JDK default is 17 (`dnf install java-17-openjdk-devel`); the
+exact search paths are in the repository README under **Setup**. If either is missing the
+run ends `BLOCKED` with the paths it tried.
 
 ## 3. What comes out
 
