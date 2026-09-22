@@ -15,10 +15,60 @@ workspaces/
 └── jvm/        OpenJDK / HotSpot
 ```
 
+## Prerequisites
+
+Nothing is installed by this repository, and the product binaries are not in it — EAP and
+Data Grid come from the Red Hat Customer Portal under your own subscription. Before the
+first run you need three things on the host.
+
+**1. Tooling.** bash 4.4+, curl, and maven (maven only for the EAP test applications).
+
+**2. The binaries, unpacked anywhere you like.** Download the **zip** distributions from
+[access.redhat.com/downloads](https://access.redhat.com/downloads) and unpack them wherever
+suits you — there is no required location, because you name the location yourself in step 3.
+
+| you want to run | download | unpack |
+|---|---|---|
+| `eap7` | Red Hat JBoss EAP 7.x | anywhere, e.g. `/opt/labs/jboss-eap-7.4` |
+| `eap8` | Red Hat JBoss EAP 8.x | anywhere, e.g. `/opt/labs/jboss-eap-8.1` |
+| `datagrid` | Red Hat Data Grid 8.x **Server** | anywhere, e.g. `/opt/labs/redhat-datagrid-8.5.2-server` |
+| `jvm` | nothing — the JDK is the product | — |
+
+A JDK too, if the host has none: `sudo dnf install java-11-openjdk-devel
+java-17-openjdk-devel`, or unpack a tarball JDK anywhere.
+
+**3. Export the homes.** Point the run at what you unpacked. Set the ones for the products
+you actually use:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk          # the JDK
+export EAP_HOME=/opt/labs/jboss-eap-8.1                # JBoss EAP home — holds bin/standalone.sh
+export RHDG_HOME=/opt/labs/redhat-datagrid-8.5.2-server # Data Grid home — holds bin/server.sh
+```
+
+Put those in `~/.bashrc` to make them permanent, or prefix a single run:
+
+```bash
+EAP_HOME=/opt/labs/jboss-eap-7.4 JAVA_HOME=/usr/lib/jvm/java-11-openjdk ./run.sh
+```
+
+`EAP_HOME` and `RHDG_HOME` override discovery completely — set them and the search paths
+below are never consulted. Note that `EAP_HOME` is per major: export the EAP 7 tree when
+running in `workspaces/eap7/` and the EAP 8 tree in `workspaces/eap8/`. Pointing an EAP 8
+tree at the `eap7` workspace is refused, not run.
+
+`JAVA_HOME` works differently, on purpose: it is used **only when its major version matches
+the JDK the case names**, because a verdict produced on the wrong JDK answers a different
+question than the customer asked. If the case says JDK 11 and `JAVA_HOME` is a 17, the run
+looks for an 11 elsewhere on the host and stops `BLOCKED` if there is none rather than
+quietly using the 17. `--allow-jdk-substitute` is the deliberate override.
+
+If you would rather not export anything, the run can find installations on its own — see
+[Setup](#setup-where-to-put-the-binaries-and-the-jdks) for the paths it searches.
+
 ## Use it
 
-First time on a machine, put the product binaries and a JDK where the run can find them —
-see [Setup](#setup-where-to-put-the-binaries-and-the-jdks). Then:
+With the prerequisites above in place:
 
 ```bash
 cd workspaces/eap7          # or eap8, datagrid, jvm
@@ -147,31 +197,26 @@ reference/               version-matrix.md · safety-rules.md · lab-targets.txt
 from the workspace's `workspace.env`. Adding a fifth product means adding a directory with
 a `workspace.env` and a `run.sh`, not editing the drivers.
 
-## Requirements
+## Setup: finding the binaries without exporting anything
 
-- bash 4.4+, curl, java, maven (for the EAP test applications)
-- **the product binaries.** They are not in this repository and cannot be — EAP and Data
-  Grid are downloaded from the Red Hat Customer Portal under your own subscription. You
-  unpack them yourself; see below.
-
-## Setup: where to put the binaries and the JDKs
-
-Nothing is installed by this repository. Each run looks for a product installation and a
-JDK already on the host, and stops with `BLOCKED` naming what it could not find rather than
-substituting something else.
+[Prerequisites](#prerequisites) above is the short path: unpack the binaries anywhere and
+export `EAP_HOME` / `RHDG_HOME` / `JAVA_HOME`. This section is for when you would rather not
+export a variable on every run. Either way each run resolves an installation and a JDK
+before it does anything else, and stops with `BLOCKED` naming what it could not find rather
+than substituting something else.
 
 ### The product installation
 
-Download the **zip** distribution from [access.redhat.com/downloads](https://access.redhat.com/downloads)
-and unpack it. Either put it where the workspace already looks, or point at it explicitly —
-the environment variable always wins over the search.
+With `EAP_HOME` / `RHDG_HOME` unset, each workspace searches a list of paths:
 
-| workspace | download | searched, in order | override |
-|---|---|---|---|
-| `eap7` | Red Hat JBoss EAP 7.x | `~/Documents/EAP_lab/jboss-eap-7*` · `/opt/jboss-eap-7*` · `~/jboss-eap-7*` · `/opt/rh/eap7` | `EAP_HOME=` |
-| `eap8` | Red Hat JBoss EAP 8.x | `~/Documents/EAP_lab/jboss-eap-8*` · `/opt/jboss-eap-8*` · `~/jboss-eap-8*` · `/opt/rh/eap8` | `EAP_HOME=` |
-| `datagrid` | Red Hat Data Grid 8.x **Server** | `~/Documents/Datagrid/redhat-datagrid-*-server` · `~/Documents/EAP_lab/redhat-datagrid-*-server` · `/opt/redhat-datagrid-*-server` · `~/infinispan-server-*` | `RHDG_HOME=` |
-| `jvm` | nothing — the JDK *is* the product | — | — |
+| workspace | searched, in order | override |
+|---|---|---|
+| `eap7` | `~/Documents/EAP_lab/jboss-eap-7*` · `/opt/jboss-eap-7*` · `~/jboss-eap-7*` · `/opt/rh/eap7` | `EAP_HOME=` |
+| `eap8` | `~/Documents/EAP_lab/jboss-eap-8*` · `/opt/jboss-eap-8*` · `~/jboss-eap-8*` · `/opt/rh/eap8` | `EAP_HOME=` |
+| `datagrid` | `~/Documents/Datagrid/redhat-datagrid-*-server` · `~/Documents/EAP_lab/redhat-datagrid-*-server` · `/opt/redhat-datagrid-*-server` · `~/infinispan-server-*` | `RHDG_HOME=` |
+| `jvm` | nothing to find — the JDK *is* the product | — |
+
+So unpacking into one of those needs no variable at all:
 
 ```bash
 mkdir -p ~/Documents/EAP_lab && cd ~/Documents/EAP_lab
@@ -182,20 +227,10 @@ mkdir -p ~/Documents/Datagrid && cd ~/Documents/Datagrid
 unzip ~/Downloads/redhat-datagrid-8.5.2-server.zip
 ```
 
-Or leave the binaries wherever they are:
-
-```bash
-EAP_HOME=/srv/labs/jboss-eap-7.4 ./run.sh
-RHDG_HOME=/srv/labs/redhat-datagrid-8.5.2-server ./run.sh
-```
-
-`EAP_HOME` is the directory holding `bin/standalone.sh`. One level of nesting is searched
-automatically, because the EAP archives unpack as `jboss-eap-7.4.0/jboss-eap-7.4/`.
-`RHDG_HOME` is the directory holding `bin/server.sh`.
-
-The search paths are not hardcoded in the drivers — they are `WS_INSTALL_GLOB` in each
-`workspaces/<product>/workspace.env`. Edit that line if your lab lives somewhere else and
-you would rather not export a variable on every run.
+One level of nesting is searched, because the EAP archives unpack as
+`jboss-eap-7.4.0/jboss-eap-7.4/`. The paths are not hardcoded in the drivers — they are
+`WS_INSTALL_GLOB` in each `workspaces/<product>/workspace.env`, so you can add your own lab
+directory there once instead of exporting on every run.
 
 **Keep more than one version unpacked if you support more than one.** Discovery collects
 every candidate and picks the install whose **own version banner** agrees with the case, not

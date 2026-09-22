@@ -49,13 +49,24 @@ overlays TCPPING discovery, **creates the REST user**, starts the cluster, then 
 bundled cache harness: create the cache, write a known set of entries, read **every one
 back from every node**, kill a node, and read them all again.
 
-It does need a Data Grid 8.x **server** distribution and a JDK already on the host — neither
-is shipped here. Unpack `redhat-datagrid-8.x-server.zip` under `~/Documents/Datagrid/` or
-`/opt/`, or point at it with `RHDG_HOME=/path/to/redhat-datagrid-8.5.2-server ./run.sh` if
-the installation is somewhere the search globs do not cover. `RHDG_HOME` is the directory
-holding `bin/server.sh`. The JDK default is 17 (`dnf install java-17-openjdk-devel`); the
-exact search paths are in the repository README under **Setup**. If either is missing the
-run ends `BLOCKED` with the paths it tried.
+### Prerequisites
+
+A Data Grid 8.x **server** distribution and a JDK have to be on the host already — neither
+is shipped here. Download `redhat-datagrid-8.x-server.zip` from the Customer Portal (the
+**server** distribution, not the library or the operator), unpack it anywhere you like,
+install a JDK (`sudo dnf install java-17-openjdk-devel`), and name both:
+
+```bash
+export RHDG_HOME=/opt/labs/redhat-datagrid-8.5.2-server   # the directory holding bin/server.sh
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+./run.sh
+```
+
+Leave `RHDG_HOME` unset and the workspace searches `~/Documents/Datagrid/redhat-datagrid-*-server`,
+`~/Documents/EAP_lab/redhat-datagrid-*-server`, `/opt/redhat-datagrid-*-server` and
+`~/infinispan-server-*` instead. `JAVA_HOME` is used only when its major matches the JDK the
+case names; the default is 17. If either is missing the run ends `BLOCKED` with the paths it
+tried. Full details in the repository README.
 
 ## 3. What comes out
 

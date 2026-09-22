@@ -45,13 +45,26 @@ From there the reproducer discovers the EAP installation, picks the JDK, plans p
 one isolated server tree per node, **builds the test application itself**, deploys it,
 starts the cluster and drives the scenario.
 
-It does need an EAP 8.x installation and a matching JDK already on the host — neither is
-shipped here. Unpack the zip under `~/Documents/EAP_lab/`, `/opt/`, or your home directory,
-or point at it with `EAP_HOME=/path/to/jboss-eap-8.1 ./run.sh`. The JDK must be **17 or
-21**: EAP 8 dies before reading any configuration on JDK 11, because its own modules are
-compiled to class file 61. `dnf install java-17-openjdk-devel`. The exact search paths and
-the version-matching rules are in the repository README under **Setup**. If either is
-missing the run ends `BLOCKED` with the paths it tried.
+### Prerequisites
+
+An EAP **8.x** installation and a matching JDK have to be on the host already — neither is
+shipped here. Unpack the zip from the Customer Portal anywhere you like, install a JDK
+(`sudo dnf install java-17-openjdk-devel`), and name both:
+
+```bash
+export EAP_HOME=/opt/labs/jboss-eap-8.1        # the directory holding bin/standalone.sh
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+./run.sh
+```
+
+The JDK must be **17 or 21**. EAP 8 dies before reading any configuration on JDK 11, because
+its own modules are compiled to class file 61 — this is not a policy, it is the product.
+
+`EAP_HOME` must be an EAP **8** tree here; a 7.x tree is refused rather than run. Leave it
+unset and the workspace searches `~/Documents/EAP_lab/jboss-eap-8*`, `/opt/jboss-eap-8*`,
+`~/jboss-eap-8*` and `/opt/rh/eap8` instead. `JAVA_HOME` is used only when its major matches
+the JDK the case names; the default is 17. If either is missing the run ends `BLOCKED` with
+the paths it tried. Full details in the repository README.
 
 ## 3. What comes out
 
