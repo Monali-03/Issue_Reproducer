@@ -1,0 +1,19 @@
+{
+  "distributed-cache": {
+    "mode": "SYNC",
+    "owners": 2,
+    "statistics": true,
+    "remote-timeout": 17500,
+    "state-transfer": {
+      "timeout": 60000,
+      "await-initial-transfer": true
+    },
+    "locking": {
+      "isolation": "REPEATABLE_READ",
+      "acquire-timeout": 15000
+    },
+    "encoding": {
+      "media-type": "text/plain"
+    }
+  }
+}

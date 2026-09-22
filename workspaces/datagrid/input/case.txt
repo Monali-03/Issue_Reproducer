@@ -1,0 +1,22 @@
+Case:       04556677
+Product:    Red Hat Data Grid
+Version:    8.5.2
+JDK:        OpenJDK 21
+OS:         RHEL 9
+Nodes:      2 server nodes in one cluster
+Mode:       server (standalone)
+Deployment: REST clients
+Frequency:  whenever one node is restarted
+
+## Expected behavior
+Entries written through the REST API stay readable from the surviving node when one node
+of the cluster goes down.
+
+## Steps to reproduce
+1. Start a 2-node Data Grid cluster.
+2. Write a set of entries through the REST API.
+3. Kill one node.
+4. Read every entry back from the surviving node.
+
+## Actual behavior
+Some entries are missing from the cache after the node is killed.

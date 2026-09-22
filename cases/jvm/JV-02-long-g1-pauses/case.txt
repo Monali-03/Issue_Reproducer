@@ -1,0 +1,43 @@
+Case:               04002002
+Product:            Red Hat build of OpenJDK
+Version:            21.0.11
+JDK:                OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         RPM
+Platform:           VM
+Nodes:              1
+
+## Topology
+A latency-sensitive REST service behind an API gateway with a 2-second client timeout.
+Heap is 8g on a 16-core VM.
+
+## Configuration
+JVM flags are in configs/jvm-args.txt. G1 with a 200 ms pause target.
+
+## Steps to reproduce
+1. Run the service under its normal request rate.
+2. Watch the gateway's p99 latency and the GC log at the same time.
+
+## Expected behavior
+Pauses stay near the 200 ms target and no request exceeds the client timeout.
+
+## Actual behavior
+Several times an hour a GC pause exceeds 3 seconds and CPU goes to 100% across all cores
+for its duration. Every in-flight request times out at the gateway. The pause target is
+set to 200 ms and is not being met.
+
+## Error messages
+No exception. The symptom is the pause itself and the resulting gateway 504s.
+
+## Logs / stack traces
+[2026-09-02T11:41:18.204+0000][gc] GC(1203) Pause Young (Normal)
+                                          (G1 Evacuation Pause) 7104M->6912M(8192M) 3412.887ms
+[2026-09-02T11:41:18.204+0000][gc] GC(1203) To-space exhausted
+
+## Frequency
+intermittent, several times an hour, under load
+
+## What the customer has already tried
+Lowered MaxGCPauseMillis from 500 to 200, which made pauses more frequent but no shorter.
+They have not tried a different collector or region size.

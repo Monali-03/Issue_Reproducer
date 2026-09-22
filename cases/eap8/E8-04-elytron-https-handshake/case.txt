@@ -1,0 +1,44 @@
+Case:               04112236
+Product:            Red Hat JBoss EAP
+Version:            8.1.0 (GA)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone
+Platform:           VM
+Nodes:              1
+
+## Topology
+Single EAP 8.1 instance serving HTTPS directly on 8443 with a PKCS12 keystore issued by
+the corporate CA. Clients are internal Java and curl callers.
+
+## Configuration
+Elytron key-store / key-manager / server-ssl-context; the https-listener references the
+ssl-context. See configs/subsystem-elytron-ssl.snippet.xml. The keystore was converted
+from JKS to PKCS12 during the EAP 8 migration.
+
+## Steps to reproduce
+1. Start the server; boot completes with no error.
+2. Run: curl -v https://eap8-host:8443/health
+3. Observe the TLS handshake.
+
+## Expected behavior
+The handshake completes and the endpoint answers.
+
+## Actual behavior
+Every HTTPS connection is rejected at the handshake. Plain HTTP on 8080 works. The server
+starts cleanly, so the problem is not visible until a client connects.
+
+## Error messages
+WFLYELY00023: KeyStore file 'application.keystore' does not exist
+javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure
+curl: (35) error:0A000410:SSL routines::sslv3 alert handshake failure
+
+## Frequency
+always, since the migration from EAP 7.4
+
+## What the customer has already tried
+Verified the keystore with keytool -list -storetype PKCS12 (the key entry is present) and
+confirmed the alias name. They have not checked whether the key-store definition still
+declares type JKS.

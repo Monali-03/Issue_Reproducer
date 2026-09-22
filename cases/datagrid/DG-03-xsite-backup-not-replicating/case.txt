@@ -1,0 +1,44 @@
+Case:               04556679
+Product:            Red Hat Data Grid
+Version:            8.6.1 (server)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.5
+Architecture:       x86_64
+Deployment:         zip (bare-metal server)
+Mode:               server (standalone)
+Platform:           VM
+Nodes:              2 nodes in site LON, 2 nodes in site NYC
+
+## Topology
+Two RHDG 8.6 clusters, one per site, joined by a RELAY2 cross-site link. LON is the
+active site; NYC is the backup. A WAN link with ~70 ms latency sits between them.
+
+## Topology addresses
+NOT PROVIDED — the customer has not supplied the relay bind addresses.
+
+## Configuration
+RELAY2 with a backup site definition on the sessions cache, strategy ASYNC. See
+configs/infinispan-xsite.snippet.xml.
+
+## Steps to reproduce
+1. Bring both sites up and confirm each forms a local cluster.
+2. Write entries into the sessions cache in LON.
+3. Read them from NYC.
+
+## Expected behavior
+Entries written in LON appear in NYC's sessions cache.
+
+## Actual behavior
+Nothing replicates. The NYC cache stays empty. The cross-site status on LON shows the
+NYC site as offline even though the WAN link is up and the relay ports are reachable.
+
+## Error messages
+ISPN000439: Received new x-site view: []
+ISPN000447: Site 'NYC' is offline, cannot send request
+
+## Frequency
+always, since the sites were first connected
+
+## What the customer has already tried
+Confirmed TCP 7900 is open both ways between the relay nodes. They have not confirmed
+that both sites use the same cluster name or that the backup site name matches exactly.

@@ -1,0 +1,47 @@
+Case:               04002003
+Product:            Red Hat build of OpenJDK
+Version:            11.0.22
+JDK:                OpenJDK 11.0.22
+OS:                 RHEL 8.9
+Architecture:       x86_64
+Deployment:         RPM
+Platform:           bare metal
+Nodes:              1
+
+## Topology
+A batch processing service with a fixed thread pool of 16 workers. Each task takes two
+locks: an account lock and a ledger lock. The order in which they are taken depends on
+which side of the transfer is processed first.
+
+## Configuration
+JVM flags are in configs/jvm-args.txt. Nothing unusual: 1g heap, default collector.
+
+## Steps to reproduce
+1. Submit a batch containing transfers in both directions between the same two accounts.
+2. Wait.
+
+## Expected behavior
+The batch completes.
+
+## Actual behavior
+The process stops making progress. CPU drops to zero, the process stays alive, and no
+work completes. jstack reports a Java-level deadlock. Only a restart clears it.
+
+## Error messages
+Found one Java-level deadlock:
+=============================
+
+## Logs / stack traces
+"pool-1-thread-3":
+  waiting to lock monitor 0x00007fb0e4006e18 (object 0x00000000f0a41180, a java.lang.Object),
+  which is held by "pool-1-thread-7"
+"pool-1-thread-7":
+  waiting to lock monitor 0x00007fb0e4009a70 (object 0x00000000f0a411a8, a java.lang.Object),
+  which is held by "pool-1-thread-3"
+
+## Frequency
+intermittent, roughly once a day under load
+
+## What the customer has already tried
+Raised the pool size from 8 to 16, which made it happen less often but did not stop it.
+Thread dumps from the hang are attached.

@@ -1,0 +1,14 @@
+Case:       04112233
+Product:    Red Hat JBoss EAP
+Version:    8.1.0
+JDK:        OpenJDK 17
+OS:         RHEL 9
+Nodes:      3 nodes behind a load balancer
+Mode:       standalone-ha
+Deployment: WAR
+
+## Expected behavior
+3 nodes should form cluster 
+
+##Issue
+3 Nodes not forming cluster using udp stack

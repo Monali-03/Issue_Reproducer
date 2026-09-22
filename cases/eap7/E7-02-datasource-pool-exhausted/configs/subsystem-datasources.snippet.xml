@@ -1,0 +1,33 @@
+<!-- Excerpt from the customer's standalone-full.xml. NOT a complete server configuration. -->
+<subsystem xmlns="urn:jboss:domain:datasources:6.0">
+    <datasources>
+        <xa-datasource jndi-name="java:/OracleDS" pool-name="OracleDS" enabled="true" use-java-context="true">
+            <xa-datasource-property name="URL">jdbc:oracle:thin:@db.example.com:1521/ORCL</xa-datasource-property>
+            <driver>oracle</driver>
+            <xa-pool>
+                <min-pool-size>5</min-pool-size>
+                <max-pool-size>20</max-pool-size>
+                <prefill>true</prefill>
+                <is-same-rm-override>false</is-same-rm-override>
+            </xa-pool>
+            <security>
+                <user-name>appuser</user-name>
+                <password>REDACTED</password>
+            </security>
+            <timeout>
+                <blocking-timeout-millis>30000</blocking-timeout-millis>
+                <idle-timeout-minutes>15</idle-timeout-minutes>
+            </timeout>
+            <validation>
+                <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker"/>
+                <background-validation>true</background-validation>
+                <background-validation-millis>60000</background-validation-millis>
+            </validation>
+        </xa-datasource>
+        <drivers>
+            <driver name="oracle" module="com.oracle.ojdbc">
+                <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
+            </driver>
+        </drivers>
+    </datasources>
+</subsystem>

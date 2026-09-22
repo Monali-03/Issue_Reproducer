@@ -1,0 +1,46 @@
+Case:               04003003
+Product:            Red Hat JBoss EAP
+Version:            7.4.0 (GA)
+JDK:                Red Hat build of OpenJDK 8u412
+OS:                 RHEL 7.9
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone
+Platform:           bare metal
+Nodes:              1
+
+## Topology
+Single EAP 7.4 instance terminating TLS directly on the https listener. A third-party
+partner calls the SOAP endpoint over HTTPS. No load balancer in front.
+
+## Configuration
+Elytron key-store / key-manager / server-ssl-context, with the https-listener bound to it.
+See configs/subsystem-elytron-ssl.snippet.xml. The keystore is JKS, RSA 2048, SHA256.
+Nothing was modified on the EAP side; the partner upgraded their client.
+
+## Steps to reproduce
+1. Partner client opens a TLS connection to https://eap-host:8443/ws/partner.
+2. The handshake is attempted.
+3. The connection is closed before any HTTP request is sent.
+
+## Expected behavior
+The handshake completes and the SOAP request is processed.
+
+## Actual behavior
+Every connection from that partner fails at the handshake. Other clients still work.
+
+## Error messages
+javax.net.ssl.SSLHandshakeException: no cipher suites in common
+io.undertow.UndertowMessages$$Missing: UT000026: Handshake failed
+
+## Logs / stack traces
+javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure
+	at sun.security.ssl.Alert.createSSLException(Alert.java:131)
+	at sun.security.ssl.TransportContext.fatal(TransportContext.java:324)
+
+## Frequency
+always, for this one partner, since 2026-08-02
+
+## What the customer has already tried
+Confirmed the certificate is valid and not expired. Ran openssl s_client with -tls1_2 and
+it connects; with -tls1_3 it fails. They have not captured the client's ClientHello.

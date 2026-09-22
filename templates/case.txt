@@ -1,0 +1,55 @@
+# Customer case — input template
+#
+# Fill what you have. Leave the rest blank; the agent marks blanks as UNKNOWN rather
+# than inventing values. Anything you can paste verbatim (errors, log lines, config)
+# is worth more than a paraphrase.
+#
+# Drop raw artifacts alongside this file:
+#   <case>/case.txt
+#   <case>/configs/       standalone.xml, infinispan.xml, httpd.conf, jgroups stacks
+#   <case>/logs/          server.log, boot.log, gc logs, httpd logs
+#   <case>/dumps/         thread dumps, .hprof
+#   <case>/attachments/   anything else
+# Then point the agent at the directory.
+
+Case:               <case number, if any>
+Product:            <JBoss EAP | Red Hat Data Grid | JWS | JBCS | OpenJDK>
+Version:            <exact, including CP/patch level if known>
+JDK:                <vendor and version>
+OS:                 <distro and version>
+Architecture:       <x86_64 | aarch64 | ppc64le | s390x>
+Deployment:         <zip | RPM | container | Operator>
+Mode:               <standalone | domain | managed domain>
+Platform:           <bare metal | VM | OpenShift x.y | Kubernetes>
+Nodes:              <count and addresses>
+
+## Topology
+<how the pieces connect: load balancer, nodes, sites, external services>
+
+## Configuration
+<the relevant parts of their config, verbatim — subsystem blocks, JGroups stack,
+ cache definitions, LB config, JVM options, system properties>
+
+## Steps to reproduce
+1. <exactly as the customer describes them, in their order>
+2.
+3.
+
+## Expected behavior
+<what the customer expects>
+
+## Actual behavior
+<what actually happens>
+
+## Error messages
+<verbatim — never paraphrased. Product codes such as WFLY*, ISPN*, JGRP*, ELY*
+ are the most useful single thing you can provide>
+
+## Logs / stack traces
+<verbatim excerpts, with timestamps>
+
+## Frequency
+<always | intermittent (how often?) | once | under load only>
+
+## What the customer has already tried
+<workarounds, config changes, version changes and their results>

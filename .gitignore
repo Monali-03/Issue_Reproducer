@@ -1,0 +1,35 @@
+# Generated reproduction packages: logs, evidence, heap dumps, node state, credentials
+# captured from customer artifacts. Never commit these.
+output/
+
+# Keep the directory itself so the agent can write into it.
+!output/.gitkeep
+
+*.pid
+*.hprof
+*.tar.gz
+nohup.out
+
+# Customer artifacts — may contain confidential data. Never commit.
+input/*
+!input/README.md
+!input/case.txt
+!input/*/.gitkeep
+
+# Stray output from running a harness standalone from the template tree.
+templates/**/output/
+templates/**/target/
+
+# --- the four product workspaces ---------------------------------------------
+# Reproduction packages: seeded server trees, logs, heap dumps, evidence, and whatever
+# credentials the customer's artifacts carried into them.
+workspaces/*/output/
+workspaces/*/.run.lock
+
+# Customer artifacts dropped into a workspace. The empty tree is tracked, the contents
+# never are.
+workspaces/*/input/*
+!workspaces/*/input/case.txt
+!workspaces/*/input/*/
+workspaces/*/input/*/*
+!workspaces/*/input/*/.gitkeep

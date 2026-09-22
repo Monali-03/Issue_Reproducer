@@ -1,0 +1,43 @@
+Case:               04002004
+Product:            Red Hat build of OpenJDK
+Version:            25.0.3
+JDK:                OpenJDK 25.0.3
+OS:                 RHEL 9.5
+Architecture:       x86_64
+Deployment:         RPM
+Platform:           VM
+Nodes:              1
+
+## Topology
+A rules engine that compiles and loads generated classes at runtime. Each rule reload
+creates a new classloader. Reloads happen roughly every 10 minutes.
+
+## Configuration
+JVM flags are in configs/jvm-args.txt. Metaspace is capped at 256m; heap is 1g.
+
+## Steps to reproduce
+1. Start the service.
+2. Trigger a rule reload every 10 minutes.
+3. Watch Metaspace committed size with jcmd VM.metaspace.
+
+## Expected behavior
+Metaspace stays flat: the classloader from the previous generation is collected and its
+class metadata released.
+
+## Actual behavior
+Metaspace grows with every reload and is never released. After about 90 reloads the JVM
+throws OutOfMemoryError: Metaspace. Heap itself stays healthy, so heap-based monitoring
+never alerts.
+
+## Error messages
+java.lang.OutOfMemoryError: Metaspace
+
+## Logs / stack traces
+[gc,metaspace] GC(451) Metaspace: 261054K(262144K)->261054K(262144K)
+
+## Frequency
+always, after roughly 90 reloads (about 15 hours)
+
+## What the customer has already tried
+Raised -XX:MaxMetaspaceSize from 128m to 256m; it doubled the time to failure. They
+suspect the generated classes are being retained but have not confirmed by what.

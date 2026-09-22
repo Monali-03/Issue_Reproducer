@@ -1,0 +1,15 @@
+Case:    04002001
+Product: Red Hat build of OpenJDK
+Version: 17.0.9
+JDK:     OpenJDK 17
+OS:      RHEL 9.3
+
+## Actual behavior
+The application dies with java.lang.OutOfMemoryError: Java heap space after a few
+hours under steady load. Heap usage grows and never comes back down after a full GC.
+
+## Error messages
+java.lang.OutOfMemoryError: Java heap space
+
+## Frequency
+always, after 3-6 hours

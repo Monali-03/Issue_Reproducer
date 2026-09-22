@@ -1,0 +1,46 @@
+Case:               04556680
+Product:            Red Hat Data Grid
+Version:            8.5.2 (server)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         zip (bare-metal server)
+Mode:               server (standalone)
+Platform:           VM
+Nodes:              2 server nodes in one cluster
+
+## Topology
+Two RHDG 8.5 server nodes. A monitoring probe polls /rest/v2/cache-managers/default/health
+/status and reports the cluster healthy. The application writes through the REST API with
+Basic authentication.
+
+## Configuration
+The default properties realm with users created by bin/cli.sh user create. Security
+authorization is enabled on the cache container. See
+configs/infinispan-security.snippet.xml and configs/users.properties.
+
+## Steps to reproduce
+1. Create the user with: bin/cli.sh user create admin -p 'REDACTED' -g admin
+2. Start both servers; the health endpoint reports HEALTHY.
+3. Call the cache API with the same credentials:
+   curl -u admin:REDACTED http://node1:11222/rest/v2/caches/sessions/key1
+
+## Expected behavior
+The call is authenticated and returns the entry.
+
+## Actual behavior
+Every real cache call is rejected, while the monitoring probe keeps reporting the cluster
+healthy — so the failure was not noticed for two days. The password is correct; logging in
+through the console with the same user works.
+
+## Error messages
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Digest realm="default", nonce="...", algorithm=MD5, qop=auth
+ISPN000287: Unauthorized access: subject 'null' lacks 'READ' permission
+
+## Frequency
+always
+
+## What the customer has already tried
+Reset the password twice. Confirmed the user exists in users.properties and is in the
+admin group. They have not checked which HTTP authentication mechanism the endpoint offers.

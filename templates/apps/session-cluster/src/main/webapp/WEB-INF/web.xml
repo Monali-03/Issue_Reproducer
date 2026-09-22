@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Session replication probe.
+
+  <distributable/> is the entire reason this app replicates. If the case is about session
+  replication, the presence or absence of this element IS part of the reproduction: a
+  customer whose app lacks it will see exactly the "sessions are lost" symptom, and that is
+  a configuration finding, not a product defect. Do not add or remove it silently; if the
+  customer's web.xml differs from this, record it in configuration-diff.txt.
+
+  Namespace tokens are substituted by templates/apps/prepare-app.sh from TARGET_MAJOR:
+    EAP 7.x -> http://xmlns.jcp.org/xml/ns/javaee    version 4.0
+    EAP 8.x -> https://jakarta.ee/xml/ns/jakartaee   version 6.0
+  Getting this wrong produces a WAR that deploys cleanly and 404s on every request.
+-->
+<web-app xmlns="__WEBXML_NS__"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="__WEBXML_NS__ __WEBXML_XSD__"
+         version="__WEBXML_VERSION__">
+
+    <display-name>repro-session</display-name>
+
+    <distributable/>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+</web-app>

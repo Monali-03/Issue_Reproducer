@@ -1,0 +1,39 @@
+Case:               04556678
+Product:            Red Hat Data Grid
+Version:            8.5.2 (server)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         zip (bare-metal server)
+Mode:               server (standalone)
+Platform:           VM
+Nodes:              3 server nodes, 10.20.6.31 / .32 / .33
+
+## Topology
+Three RHDG 8.5 server nodes intended to form one cluster. Hot Rod and REST clients both
+connect. The nodes are on one subnet; the security team disabled multicast on it.
+
+## Configuration
+Shipped infinispan.xml with the default jgroups stack. See
+configs/infinispan-jgroups.snippet.xml. No JGroups stack was customised.
+
+## Steps to reproduce
+1. Start all three servers.
+2. Check the cluster view via /rest/v2/cluster or the console.
+
+## Expected behavior
+One cluster with 3 members.
+
+## Actual behavior
+Each node reports a cluster of one — three separate clusters. Clients see different data
+depending on which node they hit, and a cache created on one node is absent on the others.
+
+## Error messages
+ISPN000094: Received new cluster view for channel <...>: [node1-12345|0] (1) [node1-12345]
+
+## Frequency
+always
+
+## What the customer has already tried
+Confirmed the nodes can reach each other on TCP 7800. They have not switched discovery
+from the default to a static list.

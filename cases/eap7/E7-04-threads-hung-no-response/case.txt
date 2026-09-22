@@ -1,0 +1,49 @@
+Case:               04003004
+Product:            Red Hat JBoss EAP
+Version:            7.4.0 (GA)
+JDK:                Red Hat build of OpenJDK 11.0.22
+OS:                 RHEL 8.9
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone
+Platform:           VM
+Nodes:              2 nodes behind mod_cluster
+
+## Topology
+Two EAP 7.4 standalone-ha instances. A scheduled EJB timer runs every 5 minutes and
+writes to the same rows the web tier updates.
+
+## Configuration
+Undertow default worker task-max-threads is 64. The EJB subsystem uses the default
+strict-max-pool. See configs/subsystem-undertow-io.snippet.xml.
+
+## Steps to reproduce
+1. Leave the application running under normal load with the timer enabled.
+2. After several hours one node stops answering.
+3. The other node keeps working until it is also hit.
+
+## Expected behavior
+Requests complete; the timer and the web tier do not block each other indefinitely.
+
+## Actual behavior
+The node stops responding to HTTP entirely. The process is alive, CPU is near zero, and
+the management CLI still connects. Only a restart clears it.
+
+## Error messages
+WFLYSRV0295: Thread pool "default" is saturated
+Found one Java-level deadlock:
+
+## Logs / stack traces
+"default task-41":
+  waiting to lock monitor 0x00007f2c1c0093a8 (object 0x00000000e1a4b1c8, a com.acme.OrderLock),
+  which is held by "EJB default - 7"
+"EJB default - 7":
+  waiting to lock monitor 0x00007f2c1c00b120 (object 0x00000000e1a4b230, a com.acme.StockLock),
+  which is held by "default task-41"
+
+## Frequency
+intermittent, roughly twice a week, under load
+
+## What the customer has already tried
+Raised task-max-threads to 128. It delayed the hang but did not prevent it. Thread dumps
+were taken with jstack at the time of the hang and are attached.

@@ -1,0 +1,26 @@
+<!-- Excerpt from the customer's standalone.xml. NOT a complete server configuration. -->
+<subsystem xmlns="urn:wildfly:elytron:14.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+    <tls>
+        <key-stores>
+            <key-store name="appKS">
+                <credential-reference clear-text="REDACTED"/>
+                <implementation type="JKS"/>
+                <file path="application.keystore" relative-to="jboss.server.config.dir"/>
+            </key-store>
+        </key-stores>
+        <key-managers>
+            <key-manager name="appKM" key-store="appKS">
+                <credential-reference clear-text="REDACTED"/>
+            </key-manager>
+        </key-managers>
+        <server-ssl-contexts>
+            <!-- protocols and cipher-suite-filter are the fields this case turns on -->
+            <server-ssl-context name="appSSC" key-manager="appKM"
+                                protocols="TLSv1.2"
+                                cipher-suite-filter="DEFAULT:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5"/>
+        </server-ssl-contexts>
+    </tls>
+</subsystem>
+
+<!-- and in the undertow subsystem: -->
+<https-listener name="https" socket-binding="https" ssl-context="appSSC" enable-http2="true"/>

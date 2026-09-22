@@ -1,0 +1,10 @@
+<!-- Excerpt from the customer's standalone-ha.xml. NOT a complete server configuration:
+     layer this onto the target install's own stock standalone-ha.xml, do not substitute it. -->
+<cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+    <transport lock-timeout="60000"/>
+    <distributed-cache name="dist" owners="2" l1-lifespan="0" mode="ASYNC">
+        <locking isolation="REPEATABLE_READ"/>
+        <transaction mode="BATCH"/>
+        <file-store/>
+    </distributed-cache>
+</cache-container>

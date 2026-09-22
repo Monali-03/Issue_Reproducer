@@ -1,0 +1,41 @@
+Case:               04112234
+Product:            Red Hat JBoss EAP
+Version:            8.1.0 (GA)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone
+Platform:           VM
+Nodes:              1
+
+## Topology
+Single EAP 8.1 instance. The WAR was migrated from an EAP 7.4 estate that is being
+decommissioned. The build was not altered other than the EAP BOM version.
+
+## Configuration
+Stock standalone.xml. The application descriptor is in configs/web.xml; the servlet uses
+annotations. The WAR's WEB-INF/lib still carries javax.servlet-api.
+
+## Steps to reproduce
+1. Deploy the WAR that ran on EAP 7.4 onto EAP 8.1.
+2. Confirm the management console shows it as deployed.
+3. Call any application URL.
+
+## Expected behavior
+The application answers on its context root, as it did on EAP 7.4.
+
+## Actual behavior
+The deployment reports success and the console shows it enabled, but every URL under the
+context root returns 404. The server logs no error at all.
+
+## Error messages
+WFLYSRV0010: Deployed "orders.war" (runtime-name : "orders.war")
+(no error; the 404 is returned by Undertow with no matching handler)
+
+## Frequency
+always
+
+## What the customer has already tried
+Redeployed, restarted, checked the context root, and confirmed the WAR structure matches
+the EAP 7.4 build that works.

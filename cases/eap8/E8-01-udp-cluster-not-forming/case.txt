@@ -1,0 +1,40 @@
+Case:               04112233
+Product:            Red Hat JBoss EAP
+Version:            8.1.0 (GA)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone-ha
+Platform:           VM
+Nodes:              3 nodes, 10.12.4.11 / .12 / .13, all in one subnet
+
+## Topology
+Three EAP 8.1 standalone-ha instances behind a load balancer. The application is a
+distributable WAR that relies on replicated HTTP state.
+
+## Configuration
+Stock standalone-ha.xml. The ee channel uses the udp stack as shipped; nothing in the
+jgroups subsystem was changed. See configs/subsystem-jgroups.snippet.xml.
+
+## Steps to reproduce
+1. Start all three nodes with -c standalone-ha.xml.
+2. Wait for boot to finish on all three.
+3. Check the cluster view on each node.
+
+## Expected behavior
+The three nodes form one cluster and each logs a view of 3 members.
+
+## Actual behavior
+Each node forms a cluster of one. They never see each other, so no state is
+shared between the nodes.
+
+## Error messages
+WFLYCLJG0033: Channel ee local address is node1, physical addresses are [10.12.4.11:55200]
+
+## Frequency
+always, since the platform team moved the VMs to a new subnet
+
+## What the customer has already tried
+Confirmed the nodes can ping each other and that TCP 7600 is open. Multicast has not been
+tested. They have not tried the tcp stack.

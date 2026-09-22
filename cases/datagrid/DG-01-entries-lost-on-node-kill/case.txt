@@ -1,0 +1,42 @@
+Case:               04556677
+Product:            Red Hat Data Grid
+Version:            8.5.2 (server)
+JDK:                Red Hat build of OpenJDK 21.0.11
+OS:                 RHEL 9.4
+Architecture:       x86_64
+Deployment:         zip (bare-metal server)
+Mode:               server (standalone)
+Platform:           VM
+Nodes:              2 server nodes in one cluster
+
+## Topology
+Two RHDG 8.5 server nodes in one cluster. Application tier writes and reads through the
+REST API. No persistence store is configured; the cache is memory-only.
+
+## Configuration
+A distributed cache created through the REST API. The cache definition is in
+configs/reprocache.json — owners is 1. Server config is the shipped infinispan.xml.
+
+## Steps to reproduce
+1. Start a 2-node Data Grid cluster and confirm both nodes report 2 members.
+2. Write 100 entries through the REST API.
+3. Read all 100 back from both nodes — all present.
+4. Kill one node with kill -9.
+5. Read every entry back from the surviving node.
+
+## Expected behavior
+All 100 entries are still readable from the surviving node.
+
+## Actual behavior
+Roughly half the entries are missing from the cache after the node is killed. GET returns
+404 for them. The cache reports a reduced size and the entries never come back.
+
+## Error messages
+HTTP/1.1 404 Not Found   (on GET /rest/v2/caches/reprocache/<key>)
+
+## Frequency
+whenever one node is restarted
+
+## What the customer has already tried
+Confirmed the surviving node reports 1 member and that rebalancing completed.
+They have not checked the owners setting on the cache.

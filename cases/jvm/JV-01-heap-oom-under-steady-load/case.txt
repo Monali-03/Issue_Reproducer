@@ -1,0 +1,41 @@
+Case:               04002001
+Product:            Red Hat build of OpenJDK
+Version:            17.0.11
+JDK:                OpenJDK 17.0.11
+OS:                 RHEL 9.3
+Architecture:       x86_64
+Deployment:         RPM
+Platform:           VM
+Nodes:              1
+
+## Topology
+A standalone Java service (Spring Boot fat jar) run from systemd. It consumes from a
+message queue and caches lookup results in a static map.
+
+## Configuration
+JVM flags are in configs/jvm-args.txt. Heap is 2g, G1 is the collector.
+
+## Steps to reproduce
+1. Start the service and leave it under steady production load.
+2. Watch old-gen occupancy after each full GC.
+
+## Expected behavior
+Heap usage returns to a stable baseline after a full GC.
+
+## Actual behavior
+The application dies with java.lang.OutOfMemoryError: Java heap space after a few hours
+under steady load. Heap usage grows and never comes back down after a full GC.
+
+## Error messages
+java.lang.OutOfMemoryError: Java heap space
+
+## Logs / stack traces
+[2026-08-30T02:14:07.551+0000][gc] GC(884) Pause Full (G1 Compaction Pause)
+                                         2041M->2038M(2048M) 9821.442ms
+
+## Frequency
+always, after 3-6 hours
+
+## What the customer has already tried
+Doubled -Xmx from 1g to 2g; the failure moved from ~2 hours to ~5 hours. A heap dump has
+been captured and is attached.

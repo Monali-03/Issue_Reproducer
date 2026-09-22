@@ -1,0 +1,23 @@
+<!-- Excerpt from the LON site's server/conf/infinispan.xml. NOT a complete configuration. -->
+<infinispan xmlns="urn:infinispan:config:15.1"
+            xmlns:server="urn:infinispan:server:15.1">
+    <jgroups>
+        <stack name="xsite" extends="tcp">
+            <relay.RELAY2 site="LON" max_site_masters="2" xmlns="urn:org:jgroups"/>
+            <remote-sites default-stack="tcp">
+                <remote-site name="LON"/>
+                <remote-site name="NYC"/>
+            </remote-sites>
+        </stack>
+    </jgroups>
+    <cache-container name="default" statistics="true">
+        <transport cluster="lon-cluster" stack="xsite"/>
+        <distributed-cache name="sessions" owners="2" statistics="true">
+            <backups>
+                <backup site="NYC" strategy="ASYNC" timeout="10000">
+                    <take-offline after-failures="3" min-wait="60000"/>
+                </backup>
+            </backups>
+        </distributed-cache>
+    </cache-container>
+</infinispan>

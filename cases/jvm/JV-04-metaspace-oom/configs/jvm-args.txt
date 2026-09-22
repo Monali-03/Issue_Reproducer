@@ -1,0 +1,1 @@
+JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxMetaspaceSize=256m -XX:+UseG1GC -Xlog:gc*,class+unload:file=/var/log/app/gc.log:time,uptime,level,tags:filecount=5,filesize=20M"

@@ -1,0 +1,14 @@
+<!-- Excerpt from the customer's server/conf/infinispan.xml. NOT a complete server
+     configuration. The namespace must be read out of the target install's own
+     infinispan.xml: it tracks the Infinispan major, not the Data Grid version number. -->
+<infinispan xmlns="urn:infinispan:config:15.0"
+            xmlns:server="urn:infinispan:server:15.0">
+    <jgroups>
+        <!-- default-configs/default-jgroups-udp.xml uses multicast discovery (MPING),
+             which finds nothing when multicast is blocked on the subnet -->
+        <stack-file name="cluster-stack" path="default-configs/default-jgroups-udp.xml"/>
+    </jgroups>
+    <cache-container name="default" statistics="true">
+        <transport cluster="${infinispan.cluster.name:cluster}" stack="cluster-stack"/>
+    </cache-container>
+</infinispan>

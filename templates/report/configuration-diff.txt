@@ -1,0 +1,93 @@
+CONFIGURATION DIFF — customer vs reproducer                      (spec §9, §20)
+Case: <case-id>          Generated: <ISO-8601>
+
+Every deviation gets a block. A deviation that is not recorded here is a defect in the
+package: it is exactly the thing a reviewer will find and the customer will not.
+
+FUNCTIONAL IMPACT is the field that matters. "none" on a deviation that plausibly affects
+the behavior under test invalidates the whole verdict. When unsure, write "unknown" and
+say what would settle it.
+
+================================================================================
+[1] <short title>
+
+CUSTOMER CONFIGURATION:
+  <what the case / their artifacts show, quoted>
+
+REPRODUCER CONFIGURATION:
+  <what this package actually runs>
+
+CHANGE:
+  <the delta, stated plainly>
+
+REASON:
+  <why it was unavoidable — not why it was convenient>
+
+FUNCTIONAL IMPACT:
+  none | unknown | <what this could change about the observed behavior>
+
+================================================================================
+[2] Product version
+
+CUSTOMER CONFIGURATION:   <x.y.z as claimed / as shown by their boot banner>
+REPRODUCER CONFIGURATION: <x.y.z verified from this install's banner>
+CHANGE:                   <none | tested a different build>
+REASON:
+FUNCTIONAL IMPACT:        <if these differ, NO verdict about the customer's version is
+                           supportable in either direction — say so here and in the README>
+
+================================================================================
+[3] Topology / addressing
+
+CUSTOMER CONFIGURATION:   <hosts, ports, discovery protocol, initial_hosts list>
+REPRODUCER CONFIGURATION: <lab hosts, ports, discovery protocol>
+CHANGE:
+REASON:
+FUNCTIONAL IMPACT:        <loopback preserves discovery semantics but cannot reproduce
+                           behavior that depends on separate physical hosts — real
+                           partitions, NIC-level loss, cross-host latency>
+
+================================================================================
+[4] JDK
+
+CUSTOMER CONFIGURATION:
+REPRODUCER CONFIGURATION:
+CHANGE:
+REASON:
+FUNCTIONAL IMPACT:
+
+================================================================================
+[5] Operating system
+
+CUSTOMER CONFIGURATION:
+REPRODUCER CONFIGURATION:
+CHANGE:
+REASON:
+FUNCTIONAL IMPACT:        <usually none; matters for glibc, kernel networking, crypto
+                           policy, SELinux>
+
+================================================================================
+[6] Application
+
+CUSTOMER CONFIGURATION:   <their deployment — usually not provided>
+REPRODUCER CONFIGURATION: <the bundled test app and what it exercises>
+CHANGE:
+REASON:
+FUNCTIONAL IMPACT:        <a minimal app exercises the reported path but not their
+                           framework stack, their session size, or their concurrency>
+
+================================================================================
+[7] JVM options
+
+CUSTOMER CONFIGURATION:
+REPRODUCER CONFIGURATION:
+CHANGE:
+REASON:
+FUNCTIONAL IMPACT:
+
+================================================================================
+SUMMARY
+
+Deviations with known-none impact:     <n>
+Deviations with unknown impact:        <n>   ← these bound the confidence
+Deviations that could explain the result: <n>  ← if non-zero, the verdict is at best PARTIAL

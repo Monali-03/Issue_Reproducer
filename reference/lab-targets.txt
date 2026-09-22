@@ -1,0 +1,26 @@
+# Authorized reproduction targets — the allow-list referenced by reference/safety-rules.md
+#
+# The agent may run destructive operations (kill, rm -rf, config rewrite) against paths
+# and resources listed here, plus anything it created under output/.
+#
+# Owned by the user. The agent reads this file and may PROPOSE additions in its report;
+# it does not add entries itself.
+#
+# Format: one entry per line.
+#   INSTALL   <absolute path>            a product installation that is a lab install
+#   NAMESPACE <cluster>/<namespace>      an OpenShift/K8s namespace that is disposable
+#   HOST      <hostname or IP>           a dedicated reproducer VM
+#
+# Anything not listed here and not under output/ is NOT authorized. When in doubt the
+# agent must ask rather than assume.
+
+# --- product installations -------------------------------------------------
+# INSTALL   /home/mopatil/Documents/EAP_lab/jboss-eap-7.4.0/jboss-eap-7.4
+# INSTALL   /home/mopatil/Documents/EAP_lab/jboss-eap-8.1.0/jboss-eap-8.1
+# INSTALL   /home/mopatil/Documents/Datagrid/redhat-datagrid-8.5.2-server
+
+# --- OpenShift / Kubernetes ------------------------------------------------
+# NAMESPACE crc-cluster/repro-lab
+
+# --- dedicated hosts -------------------------------------------------------
+# HOST      127.0.0.1

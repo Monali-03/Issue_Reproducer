@@ -1,0 +1,24 @@
+Case:    04003001
+Product: Red Hat JBoss EAP
+Version: 7.4.0
+JDK:     OpenJDK 11
+OS:      RHEL 8.9
+Nodes:   2 nodes behind a load balancer
+Mode:    standalone
+
+## Topology
+Two EAP 7.4 standalone-ha instances behind mod_cluster.
+
+## Steps to reproduce
+1. Log in on node1, the session is created.
+2. Kill node1.
+3. The next request goes to node2.
+
+## Expected behavior
+The session continues on node2.
+
+## Actual behavior
+The user is logged out — node2 issues a brand new session.
+
+## Frequency
+always

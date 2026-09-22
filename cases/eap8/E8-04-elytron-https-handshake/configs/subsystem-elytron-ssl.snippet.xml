@@ -1,0 +1,27 @@
+<!-- Excerpt from the customer's EAP 8.1 standalone.xml. NOT a complete server configuration.
+     Layer onto the target install's own stock standalone.xml; the elytron schema version
+     differs between EAP 7.4 and EAP 8.1 and must be read from the install, not copied. -->
+<subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers">
+    <tls>
+        <key-stores>
+            <key-store name="appKS">
+                <credential-reference clear-text="REDACTED"/>
+                <!-- the keystore file on disk is PKCS12; the declared type is the field
+                     this case turns on -->
+                <implementation type="JKS"/>
+                <file path="application.keystore" relative-to="jboss.server.config.dir"/>
+            </key-store>
+        </key-stores>
+        <key-managers>
+            <key-manager name="appKM" key-store="appKS" alias-filter="server">
+                <credential-reference clear-text="REDACTED"/>
+            </key-manager>
+        </key-managers>
+        <server-ssl-contexts>
+            <server-ssl-context name="appSSC" key-manager="appKM" protocols="TLSv1.3 TLSv1.2"/>
+        </server-ssl-contexts>
+    </tls>
+</subsystem>
+
+<!-- and in the undertow subsystem: -->
+<https-listener name="https" socket-binding="https" ssl-context="appSSC" enable-http2="true"/>

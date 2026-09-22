@@ -1,0 +1,46 @@
+Case:               04003002
+Product:            Red Hat JBoss EAP
+Version:            7.4.0 (GA)
+JDK:                Red Hat build of OpenJDK 11.0.22
+OS:                 RHEL 8.10
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone
+Platform:           VM
+Nodes:              1
+
+## Topology
+Single EAP 7.4 instance, standalone-full.xml, one Oracle XA datasource used by an EJB
+layer. Roughly 400 concurrent users at peak.
+
+## Configuration
+The datasources subsystem block is in configs/subsystem-datasources.snippet.xml.
+max-pool-size is 20; blocking-timeout-wait-millis is 30000.
+
+## Steps to reproduce
+1. Start the application under normal daytime load.
+2. Within 20-40 minutes of peak traffic, requests begin to queue.
+3. Every request that touches the database then fails.
+
+## Expected behavior
+Connections are returned to the pool and requests complete.
+
+## Actual behavior
+The connection pool is exhausted and never recovers without a restart. Thread dumps show
+worker threads parked in the pool's blocking wait.
+
+## Error messages
+javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:/OracleDS
+IJ000655: No managed connections available within configured blocking timeout (30000 [ms])
+
+## Logs / stack traces
+"default task-118" #118 waiting on condition
+   at jdk.internal.misc.Unsafe.park(java.base@11.0.22/Native Method)
+   at org.jboss.jca.core.connectionmanager.pool.mcp.SemaphoreConcurrentLinkedDequeManagedConnectionPool.getConnection(...)
+
+## Frequency
+under load only, every business day
+
+## What the customer has already tried
+Raised max-pool-size from 20 to 50; the exhaustion took longer to appear but still happened.
+No leak detection (cached-connection-manager debug) has been enabled yet.

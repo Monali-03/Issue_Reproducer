@@ -1,0 +1,45 @@
+Case:               04112235
+Product:            Red Hat JBoss EAP
+Version:            8.1.0 (GA)
+JDK:                Red Hat build of OpenJDK 17.0.11
+OS:                 RHEL 9.3
+Architecture:       x86_64
+Deployment:         zip
+Mode:               standalone
+Platform:           VM
+Nodes:              1
+
+## Topology
+Single EAP 8.1 instance. A CI pipeline hot-redeploys the WAR roughly 15 times a day
+without restarting the server.
+
+## Configuration
+JVM options are set in bin/standalone.conf — see configs/standalone.conf. Heap is 4g,
+G1 is the collector, and there is no explicit Metaspace cap.
+
+## Steps to reproduce
+1. Start the server and deploy the application.
+2. Undeploy and redeploy the same WAR repeatedly.
+3. Watch heap and Metaspace after each full GC.
+
+## Expected behavior
+Memory returns to roughly its previous level after each redeploy.
+
+## Actual behavior
+Old-gen occupancy after a full GC rises with every redeploy and never comes back down.
+After about 40 redeploys the server throws OutOfMemoryError and must be restarted. A heap
+dump shows multiple retained instances of the application's ModuleClassLoader.
+
+## Error messages
+java.lang.OutOfMemoryError: Java heap space
+WFLYSRV0022: Deploy of deployment "orders.war" was rolled back with no failure message
+
+## Logs / stack traces
+[Full GC (Allocation Failure) 3891M->3874M(4096M), 12.4432120 secs]
+
+## Frequency
+always, after roughly 40 redeploys
+
+## What the customer has already tried
+Raised -Xmx from 2g to 4g; it only postponed the failure. A heap dump was captured with
+jmap and is attached.

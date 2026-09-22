@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Non-clustered probe.
+
+  Deliberately has NO <distributable/> element. This blueprint is for cases that are not
+  about session replication: deployment failures, TLS, datasources, classloading, JVM
+  behavior. If the case turns out to involve session failover, switch to the
+  session-cluster blueprint rather than adding <distributable/> here.
+
+  Namespace tokens are substituted by templates/apps/prepare-app.sh from TARGET_MAJOR:
+    EAP 7.x -> http://xmlns.jcp.org/xml/ns/javaee    version 4.0
+    EAP 8.x -> https://jakarta.ee/xml/ns/jakartaee   version 6.0
+-->
+<web-app xmlns="__WEBXML_NS__"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="__WEBXML_NS__ __WEBXML_XSD__"
+         version="__WEBXML_VERSION__">
+
+    <display-name>repro-simple</display-name>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+</web-app>
