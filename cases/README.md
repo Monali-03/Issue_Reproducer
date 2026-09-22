@@ -19,7 +19,7 @@ cases/<product>/<ID>-<slug>/
 The workspaces read `workspaces/<product>/input/`, so copy a case in:
 
 ```bash
-cd /home/mopatil/REDHAT_Reproducer/reproducer
+cd <the repository root>
 cp cases/eap8/E8-02-migrated-war-404/case.txt          workspaces/eap8/input/case.txt
 cp cases/eap8/E8-02-migrated-war-404/configs/*         workspaces/eap8/input/configs/
 ./workspaces/eap8/run.sh

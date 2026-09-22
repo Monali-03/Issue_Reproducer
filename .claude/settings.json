@@ -35,8 +35,7 @@
       "Bash(stat:*)",
       "Bash(sha256sum:*)",
       "Bash(bash -n:*)",
-      "Bash(shellcheck:*)",
-      "Read(//home/mopatil/REDHAT_Reproducer/**)"
+      "Bash(shellcheck:*)"
     ],
     "deny": [
       "Bash(shutdown:*)",
